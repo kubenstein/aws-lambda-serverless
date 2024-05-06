@@ -1,0 +1,17 @@
+{
+  "name": "dynamodb-serverless",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serverless": "serverless"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.18.0",
+    "@aws-sdk/util-dynamodb": "^3.18.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-iam-roles-per-function": "^3.2.0",
+    "serverless-prune-plugin": "^2.0.2"
+  }
+}

@@ -1,0 +1,57 @@
+service: dynamodb-lambda
+
+provider:
+  name: aws
+  region: ap-northeast-1
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  deploymentMethod: direct
+  environment:
+    DYNAMODB_TABLE_NAME: ${self:custom.dynamoTableName}
+
+custom:
+  prefix: ${self:service}-${self:provider.stage}-
+  dynamoTableName: ${self:custom.prefix}-posts-table
+  prune:
+    automatic: true
+    number: 0
+
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-prune-plugin
+
+resources:
+  Resources:
+    MainTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamoTableName}
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  app:
+    handler: lambda-entry-point.handler
+    name: ${self:custom.prefix}-app
+    memorySize: 128 # mb
+    timeout: 5 # seconds
+    events:
+      - http:
+          path: /
+          method: any
+      - http:
+          path: /{proxy+}
+          method: any
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:PutItem"
+          - "dynamodb:GetItem"
+        Resource: !GetAtt MainTable.Arn
