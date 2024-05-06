@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "serverless": "serverless",
-    "dev": "AWS_ACCESS_KEY_ID=dev AWS_SECRET_ACCESS_KEY=dev serverless offline start"
+    "dev": "AWS_ACCESS_KEY_ID=dev AWS_SECRET_ACCESS_KEY=dev serverless offline start --stage dev",
+    "deploy:staging": "serverless deploy --verbose --stage stg",
+    "deploy:production": "serverless deploy --verbose --stage prod"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.18.0",
