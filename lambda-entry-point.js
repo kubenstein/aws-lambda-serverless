@@ -1,7 +1,11 @@
 const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
 const { marshall } = require("@aws-sdk/util-dynamodb");
 
-const db = new DynamoDBClient({});
+const db = new DynamoDBClient(
+  process.env.IS_OFFLINE && {
+    endpoint: "http://localhost:8000"
+  }
+);
 
 exports.handler = async _event => {
   const response = { statusCode: 200 };

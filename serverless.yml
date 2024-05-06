@@ -7,25 +7,39 @@ provider:
   stage: ${opt:stage, 'dev'}
   deploymentMethod: direct
   environment:
-    DYNAMODB_TABLE_NAME: ${self:custom.dynamoTableName}
+    DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
 
 custom:
   prefix: ${self:service}-${self:provider.stage}-
-  dynamoTableName: ${self:custom.prefix}-posts-table
+  dynamodbTableName: ${self:custom.prefix}-posts-table
   prune:
     automatic: true
     number: 0
+  serverless-offline:
+    reloadHandler: true
+  serverless-dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      docker: true
+      sharedDb: true
+      inMemory: true
+      delayTransientStatuses: true
+      migrate: true
 
 plugins:
   - serverless-iam-roles-per-function
   - serverless-prune-plugin
+  - serverless-dynamodb
+  - serverless-offline
 
 resources:
   Resources:
     MainTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.dynamoTableName}
+        TableName: ${self:custom.dynamodbTableName}
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
