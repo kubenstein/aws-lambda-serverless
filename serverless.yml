@@ -52,7 +52,7 @@ resources:
 
 functions:
   app:
-    handler: lambda-entry-point.handler
+    handler: ./src/backend/app-entry-point.handler
     name: ${self:custom.prefix}-app
     memorySize: 128 # mb
     timeout: 5 # seconds
