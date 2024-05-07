@@ -9,6 +9,15 @@ provider:
   environment:
     DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
 
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-plugin-scripts
+  - serverless-s3-sync
+  - serverless-prune-plugin
+  # dev
+  - serverless-dynamodb
+  - serverless-offline
+
 custom:
   prefix: ${self:service}-${self:provider.stage}-
   dynamodbTableName: ${self:custom.prefix}-posts-table
@@ -36,15 +45,6 @@ custom:
       inMemory: true
       delayTransientStatuses: true
       migrate: true
-
-plugins:
-  - serverless-iam-roles-per-function
-  - serverless-plugin-scripts
-  - serverless-s3-sync
-  - serverless-prune-plugin
-  # dev
-  - serverless-dynamodb
-  - serverless-offline
 
 resources:
   Resources:
