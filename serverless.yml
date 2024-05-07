@@ -9,12 +9,30 @@ provider:
   environment:
     DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
 
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-plugin-scripts
+  - serverless-s3-sync
+  - serverless-prune-plugin
+  # dev
+  - serverless-dynamodb
+  - serverless-offline
+
 custom:
   prefix: ${self:service}-${self:provider.stage}-
   dynamodbTableName: ${self:custom.prefix}-posts-table
+  frontendBucketName: ${self:custom.prefix}-frontend
+  scripts:
+    hooks:
+      "aws:deploy:deploy:updateStack": "LAMBDA_ENDPOINT=$(yarn run serverless info --stage ${self:provider.stage} --verbose | grep 'endpoint' | rev | cut -d ' ' -f1 | rev) yarn run build:frontend"
+  s3Sync:
+    - bucketName: ${self:custom.frontendBucketName}
+      localDir: ./.build/frontend/
+      deleteRemoved: true
   prune:
     automatic: true
     number: 0
+
   serverless-offline:
     reloadHandler: true
   serverless-dynamodb:
@@ -27,12 +45,6 @@ custom:
       inMemory: true
       delayTransientStatuses: true
       migrate: true
-
-plugins:
-  - serverless-iam-roles-per-function
-  - serverless-prune-plugin
-  - serverless-dynamodb
-  - serverless-offline
 
 resources:
   Resources:
@@ -50,19 +62,43 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
+    FrontendBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.frontendBucketName}
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: ObjectWriter
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+
+    FrontendBucketAccessPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: FrontendBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action:
+                - s3:GetObject
+              Resource: arn:aws:s3:::${self:custom.frontendBucketName}/*
+  Outputs:
+    FrontendUrl:
+      Value: "http://${self:custom.frontendBucketName}.s3-website-${self:provider.region}.amazonaws.com"
+
 functions:
-  app:
-    handler: lambda-entry-point.handler
-    name: ${self:custom.prefix}-app
+  main:
+    handler: ./src/backend/app-entry-point.handler
+    name: ${self:custom.prefix}-main
     memorySize: 128 # mb
     timeout: 5 # seconds
-    events:
-      - http:
-          path: /
-          method: any
-      - http:
-          path: /{proxy+}
-          method: any
+    url: true
     iamRoleStatements:
       - Effect: "Allow"
         Action:
