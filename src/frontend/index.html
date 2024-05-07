@@ -1,4 +1,53 @@
-<h1>hello world!</h1>
-<p>
-  Lambda url is: <a href="%VITE_LAMBDA_ENDPOINT%">%VITE_LAMBDA_ENDPOINT%</a>
-</p>
+<body>
+  <script src="https://unpkg.com/vue@3"></script>
+
+  <div id="app">
+    <h1>Hello Vue Lambda/DynamoDB!</h1>
+    <form @submit.prevent="addPost">
+      <label for="newPost">Add a Post:</label><br />
+      <input type="text" id="newPost" v-model="newPost">
+      <button type="submit">Add</button>
+    </form>
+    <p>Posts:</p>
+    <ul v-if="posts.length > 0">
+      <li v-for="post in posts">{{ post.content }}</li>
+    </ul>
+    <span v-else>Loading...</span>
+  </div>
+
+  <script>
+    const API_URL = "%VITE_LAMBDA_ENDPOINT%";
+    Vue.createApp({
+      data() {
+        return {
+          posts: [],
+          newPost: ''
+        }
+      },
+
+      mounted() {
+        this.fetchData();
+      },
+
+      methods: {
+        async fetchData() {
+          this.posts = await fetch(`${API_URL}/posts`).then(response => response.json());
+        },
+
+        async addPost() {
+          const response = await fetch(`${API_URL}/posts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: this.newPost })
+          });
+          if (response.ok) {
+            this.newPost = '';
+            this.fetchData();
+          } else {
+            console.error('Failed to add post');
+          }
+        }
+      }
+    }).mount('#app')
+  </script>
+</body>
