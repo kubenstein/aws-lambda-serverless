@@ -3,7 +3,7 @@ const { marshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient(
   process.env.IS_OFFLINE && {
-    endpoint: "http://localhost:8001"
+    endpoint: "http://localhost:8000"
   }
 );
 
