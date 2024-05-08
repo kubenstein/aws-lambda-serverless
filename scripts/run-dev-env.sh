@@ -25,6 +25,8 @@ AWS_ACCESS_KEY_ID=dev AWS_SECRET_ACCESS_KEY=dev \
       ' \
       '
         # DynamoDB
+        mkdir -p $(pwd)/.db/
+        touch $(pwd)/.db/shared-local-instance.db
         docker run -i --rm \
           -p 8000:8000 \
           -v $(PWD)/.db/:/usr/app/data \
