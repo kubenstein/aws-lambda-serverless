@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serverless": "serverless",
-    "dev": "AWS_ACCESS_KEY_ID=dev AWS_SECRET_ACCESS_KEY=dev concurrently -n BK,FR,DB,DB -c yellow,green,blue,cyan --kill-others-on-fail 'serverless offline start --nos3sync --stage dev' 'VITE_LAMBDA_ENDPOINT=http://localhost:3001/dev vite --port 3000 ./src/frontend/' 'docker run -i --rm -p 8000:8000 -v $(PWD)/.db/:/usr/app/data amazon/dynamodb-local -jar DynamoDBLocal.jar -disableTelemetry -sharedDb -dbPath /usr/app/data/' 'wait-on tcp:8000 && serverless dynamodb migrate'",
+    "dev": "./scripts/run-dev-env.sh",
     "build:frontend": "VITE_LAMBDA_ENDPOINT=$LAMBDA_ENDPOINT vite build --emptyOutDir --outDir ../../.build/frontend/ ./src/frontend/",
     "deploy:staging": "serverless deploy --verbose --stage stg",
     "deploy:production": "serverless deploy --verbose --stage prod"
