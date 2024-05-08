@@ -22,9 +22,9 @@ module.exports = async params => {
         Item: marshall(item),
       })
     );
-    return { succesful: true };
+    return { successful: true };
   } catch (e) {
     console.error(e);
-    return { succesful: false, errors: [e] };
+    return { successful: false, errors: [e] };
   }
 };
