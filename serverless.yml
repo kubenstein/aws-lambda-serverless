@@ -43,6 +43,8 @@ custom:
 
   functionEvents:
     perEnv:
+      prod: ""
+      stg: ""
       dev:
         - http:
             path: /{proxy+}
@@ -96,7 +98,7 @@ resources:
 
 functions:
   main:
-    handler: ./src/backend/app-entry-point.handler
+    handler: ./src/backend/lambda-entry-point.handler
     name: ${self:custom.prefix}-main
     memorySize: 128 # mb
     timeout: 5 # seconds
@@ -108,4 +110,5 @@ functions:
         Action:
           - "dynamodb:PutItem"
           - "dynamodb:GetItem"
+          - "dynamodb:Scan"
         Resource: !GetAtt MainTable.Arn

@@ -21,7 +21,7 @@ AWS_ACCESS_KEY_ID=dev AWS_SECRET_ACCESS_KEY=dev \
         # Frontend
         echo waiting for dynamoDB
         wait-on tcp:8000 && \
-          VITE_LAMBDA_ENDPOINT=http://localhost:3001/dev vite --port 3000 ./src/frontend/
+          VITE_LAMBDA_ENDPOINT=http://localhost:3001/dev/ vite --port 3000 ./src/frontend/
       ' \
       '
         # DynamoDB

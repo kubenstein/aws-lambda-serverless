@@ -16,7 +16,7 @@
   </div>
 
   <script>
-    const API_URL = "%VITE_LAMBDA_ENDPOINT%";
+    const API_URL = "%VITE_LAMBDA_ENDPOINT%".replace(/\/$/, '');
     Vue.createApp({
       data() {
         return {
