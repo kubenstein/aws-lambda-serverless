@@ -35,16 +35,20 @@ custom:
 
   serverless-offline:
     reloadHandler: true
+    httpPort: 3001
+
   serverless-dynamodb:
-    stages:
-      - dev
     start:
-      port: 8000
-      docker: true
-      sharedDb: true
-      inMemory: true
-      delayTransientStatuses: true
-      migrate: true
+      noStart: true
+
+  functionEvents:
+    perEnv:
+      prod: ""
+      stg: ""
+      dev:
+        - http:
+            path: /{proxy+}
+            method: any
 
 resources:
   Resources:
@@ -94,14 +98,17 @@ resources:
 
 functions:
   main:
-    handler: ./src/backend/app-entry-point.handler
+    handler: ./src/backend/lambda-entry-point.handler
     name: ${self:custom.prefix}-main
     memorySize: 128 # mb
     timeout: 5 # seconds
     url: true
+    events: ${self:custom.functionEvents.perEnv.${self:provider.stage}}
+
     iamRoleStatements:
       - Effect: "Allow"
         Action:
           - "dynamodb:PutItem"
           - "dynamodb:GetItem"
+          - "dynamodb:Scan"
         Resource: !GetAtt MainTable.Arn

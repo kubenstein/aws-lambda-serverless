@@ -4,16 +4,19 @@
   "private": true,
   "scripts": {
     "serverless": "serverless",
-    "dev": "AWS_ACCESS_KEY_ID=dev AWS_SECRET_ACCESS_KEY=dev serverless offline start --nos3sync --stage dev",
+    "dev": "./scripts/run-dev-env.sh",
     "build:frontend": "VITE_LAMBDA_ENDPOINT=$LAMBDA_ENDPOINT vite build --emptyOutDir --outDir ../../.build/frontend/ ./src/frontend/",
     "deploy:staging": "serverless deploy --verbose --stage stg",
     "deploy:production": "serverless deploy --verbose --stage prod"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.18.0",
-    "@aws-sdk/util-dynamodb": "^3.18.0"
+    "@aws-sdk/util-dynamodb": "^3.18.0",
+    "hono": "^4.3.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "serverless": "^3.38.0",
     "serverless-dynamodb": "^0.2.53",
     "serverless-iam-roles-per-function": "^3.2.0",
@@ -21,6 +24,7 @@
     "serverless-plugin-scripts": "^1.0.2",
     "serverless-prune-plugin": "^2.0.2",
     "serverless-s3-sync": "^3.3.0",
-    "vite": "^5.2.11"
+    "vite": "^5.2.11",
+    "wait-on": "^7.2.0"
   }
 }
