@@ -97,9 +97,9 @@ resources:
       Value: "http://${self:custom.frontendBucketName}.s3-website-${self:provider.region}.amazonaws.com"
 
 functions:
-  main:
-    handler: ./src/backend/lambda-entry-point.handler
-    name: ${self:custom.prefix}-main
+  app:
+    handler: ./src/backend/entry-point-app.handler
+    name: ${self:custom.prefix}-app
     memorySize: 128 # mb
     timeout: 5 # seconds
     url: true
