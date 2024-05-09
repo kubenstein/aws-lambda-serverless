@@ -6,8 +6,8 @@
     "serverless": "serverless",
     "dev": "./scripts/run-dev-env.sh",
     "build:frontend": "VITE_LAMBDA_ENDPOINT=$LAMBDA_ENDPOINT vite build --emptyOutDir --outDir ../../.build/frontend/ ./src/frontend/",
-    "deploy:staging": "serverless deploy --verbose --stage stg",
-    "deploy:production": "serverless deploy --verbose --stage prod"
+    "deploy:stg": "serverless deploy --verbose --stage stg",
+    "deploy:prod": "serverless deploy --verbose --stage prod"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.18.0",
