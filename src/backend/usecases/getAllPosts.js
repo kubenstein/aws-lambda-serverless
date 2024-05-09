@@ -15,9 +15,9 @@ module.exports = async () => {
     const payload = data.Items.map(item => unmarshall(item)).sort(
       (a, b) => b.createdAt - a.createdAt
     );
-    return { succesful: true, payload };
+    return { successful: true, payload };
   } catch (e) {
     console.error(e);
-    return { succesful: false, errors: [e] };
+    return { successful: false, errors: [e] };
   }
 };

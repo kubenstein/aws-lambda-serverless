@@ -9,8 +9,8 @@ app.use(logger());
 app.use("*", cors());
 
 app.get("/posts", async c => {
-  const { succesful, payload = {}, errors = [] } = await getAllPosts();
-  if (succesful) {
+  const { successful, payload = {}, errors = [] } = await getAllPosts();
+  if (successful) {
     return c.json(payload);
   } else {
     return c.json(errors, { status: 422 });
@@ -19,8 +19,8 @@ app.get("/posts", async c => {
 
 app.post("/posts", async c => {
   const params = await c.req.json();
-  const { succesful, payload = {}, errors = [] } = await createPost(params);
-  if (succesful) {
+  const { successful, payload = {}, errors = [] } = await createPost(params);
+  if (successful) {
     return c.json(payload);
   } else {
     return c.json(errors, { status: 422 });
