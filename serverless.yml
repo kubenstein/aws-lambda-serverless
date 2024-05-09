@@ -6,8 +6,6 @@ provider:
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
   deploymentMethod: direct
-  environment:
-    DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
 
 plugins:
   - serverless-iam-roles-per-function
@@ -103,12 +101,28 @@ functions:
     memorySize: 128 # mb
     timeout: 5 # seconds
     url: true
+    environment:
+      DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
     events: ${self:custom.functionEvents.perEnv.${self:provider.stage}}
-
     iamRoleStatements:
       - Effect: "Allow"
         Action:
           - "dynamodb:PutItem"
           - "dynamodb:GetItem"
           - "dynamodb:Scan"
+        Resource: !GetAtt MainTable.Arn
+
+  dbBackup:
+    handler: ./src/backend/entry-point-db-backup.handler
+    name: ${self:custom.prefix}-db-backup
+    memorySize: 128 # mb
+    timeout: 5 # seconds
+    environment:
+      DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
+    events:
+      - schedule: rate(1 day)
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:CreateBackup"
         Resource: !GetAtt MainTable.Arn
