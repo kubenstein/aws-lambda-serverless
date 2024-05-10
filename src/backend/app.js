@@ -7,6 +7,7 @@ const createPost = require("./usecases/createPost.js");
 const app = new Hono();
 app.use(logger());
 app.use("*", cors());
+app.onError(err => { throw err });
 
 app.get("/posts", async c => {
   const { successful, payload = {}, errors = [] } = await getAllPosts();
@@ -15,6 +16,10 @@ app.get("/posts", async c => {
   } else {
     return c.json(errors, { status: 422 });
   }
+});
+
+app.get("/error-me", async c => {
+  throw new Error("demo-error");
 });
 
 app.post("/posts", async c => {
