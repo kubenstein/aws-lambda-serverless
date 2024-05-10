@@ -3,6 +3,9 @@
 
   <div id="app">
     <h1>Hello Vue Lambda/DynamoDB!</h1>
+    <hr />
+    <button @click="submitError">Test Error</button>
+    <hr />
     <form @submit.prevent="addPost">
       <label for="newPost">Add a Post:</label><br />
       <input type="text" id="newPost" v-model="newPost">
@@ -32,6 +35,10 @@
       methods: {
         async fetchData() {
           this.posts = await fetch(`${API_URL}/posts`).then(response => response.json());
+        },
+
+        async submitError() {
+          await fetch(`${API_URL}/error-me`);
         },
 
         async addPost() {

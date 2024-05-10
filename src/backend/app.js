@@ -18,6 +18,10 @@ app.get("/posts", async c => {
   }
 });
 
+app.get("/error-me", async c => {
+  throw new Error("demo-error");
+});
+
 app.post("/posts", async c => {
   const params = await c.req.json();
   const { successful, payload = {}, errors = [] } = await createPost(params);
