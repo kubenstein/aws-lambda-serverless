@@ -7,6 +7,7 @@ const createPost = require("./usecases/createPost.js");
 const app = new Hono();
 app.use(logger());
 app.use("*", cors());
+app.onError(err => { throw err });
 
 app.get("/posts", async c => {
   const { successful, payload = {}, errors = [] } = await getAllPosts();
