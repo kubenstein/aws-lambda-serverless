@@ -17,6 +17,7 @@ plugins:
   - serverless-offline
 
 custom:
+  alertsEmail: niewczas.jakub@gmail.com
   prefix: ${self:service}-${self:provider.stage}-
   dynamodbTableName: ${self:custom.prefix}-posts-table
   frontendBucketName: ${self:custom.prefix}-frontend
@@ -90,6 +91,53 @@ resources:
               Action:
                 - s3:GetObject
               Resource: arn:aws:s3:::${self:custom.frontendBucketName}/*
+
+    ErrorsTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: ${self:custom.prefix}-errors
+
+    ErrorsTopicSubscription:
+      Type: AWS::SNS::Subscription
+      Properties:
+        Endpoint: ${self:custom.alertsEmail}
+        Protocol: email
+        TopicArn: !Ref ErrorsTopic
+
+    ErrorsAlarmAppFunction:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmDescription: "Alarms for ${self:custom.prefix}-app"
+        Namespace: AWS/Lambda
+        MetricName: Errors
+        Statistic: Sum
+        Threshold: 1
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+        EvaluationPeriods: 1
+        Period: 300 # 5min
+        Dimensions:
+        - Name: FunctionName
+          Value: ${self:custom.prefix}-app
+        AlarmActions:
+          - !Ref ErrorsTopic
+
+    ErrorsAlarmDbBackupFunction:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmDescription: "Alarms for ${self:custom.prefix}-db-backup"
+        Namespace: AWS/Lambda
+        MetricName: Errors
+        Statistic: Sum
+        Threshold: 1
+        ComparisonOperator: GreaterThanOrEqualToThreshold
+        EvaluationPeriods: 1
+        Period: 300 # 5min
+        Dimensions:
+        - Name: FunctionName
+          Value: ${self:custom.prefix}-db-backup
+        AlarmActions:
+          - !Ref ErrorsTopic
+
   Outputs:
     FrontendUrl:
       Value: "http://${self:custom.frontendBucketName}.s3-website-${self:provider.region}.amazonaws.com"
