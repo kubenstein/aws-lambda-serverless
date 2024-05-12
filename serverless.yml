@@ -12,6 +12,7 @@ plugins:
   - serverless-plugin-scripts
   - serverless-s3-sync
   - serverless-prune-plugin
+  - serverless-domain-manager
   # dev
   - serverless-dynamodb
   - serverless-offline
@@ -21,6 +22,11 @@ custom:
   prefix: ${self:service}-${self:provider.stage}-
   dynamodbTableName: ${self:custom.prefix}-posts-table
   frontendBucketName: ${self:custom.prefix}-frontend
+  customDomain:
+    domainName: "jakubniewczas.win"
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: false
   scripts:
     hooks:
       "aws:deploy:deploy:updateStack": "LAMBDA_ENDPOINT=$(yarn run serverless info --stage ${self:provider.stage} --verbose | grep 'ANY' | head -n1 | rev | cut -d ' ' -f1 | rev) yarn run build:frontend"
