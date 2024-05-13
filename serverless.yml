@@ -12,18 +12,25 @@ plugins:
   - serverless-plugin-scripts
   - serverless-s3-sync
   - serverless-prune-plugin
+  - serverless-domain-manager
   # dev
   - serverless-dynamodb
   - serverless-offline
 
 custom:
+  apiDomain: api.jakubniewczas.win
   alertsEmail: niewczas.jakub@gmail.com
   prefix: ${self:service}-${self:provider.stage}-
   dynamodbTableName: ${self:custom.prefix}-posts-table
   frontendBucketName: ${self:custom.prefix}-frontend
+  customDomain:
+    domainName: ${self:custom.apiDomain}
+    basePath: ''
+    stage: ${self:provider.stage}
+    createRoute53Record: false
   scripts:
     hooks:
-      "aws:deploy:deploy:updateStack": "LAMBDA_ENDPOINT=$(yarn run serverless info --stage ${self:provider.stage} --verbose | grep 'endpoint' | rev | cut -d ' ' -f1 | rev) yarn run build:frontend"
+      "aws:deploy:deploy:updateStack": "LAMBDA_ENDPOINT=$(yarn run serverless info --stage ${self:provider.stage} --verbose | grep 'ANY' | head -n1 | rev | cut -d ' ' -f1 | rev) yarn run build:frontend"
   s3Sync:
     - bucketName: ${self:custom.frontendBucketName}
       localDir: ./.build/frontend/
@@ -39,15 +46,6 @@ custom:
   serverless-dynamodb:
     start:
       noStart: true
-
-  functionEvents:
-    perEnv:
-      prod: ""
-      stg: ""
-      dev:
-        - http:
-            path: /{proxy+}
-            method: any
 
 resources:
   Resources:
@@ -91,6 +89,23 @@ resources:
               Action:
                 - s3:GetObject
               Resource: arn:aws:s3:::${self:custom.frontendBucketName}/*
+
+    ApiDomainCertificate:
+      Type: AWS::CertificateManager::Certificate
+      Properties:
+        DomainName: ${self:custom.apiDomain}
+        SubjectAlternativeNames:
+          - "*.${self:custom.apiDomain}"
+        ValidationMethod: DNS
+
+    ApiGatewayCustomDomain:
+      Type: AWS::ApiGateway::DomainName
+      Properties:
+        RegionalCertificateArn: !Ref ApiDomainCertificate
+        DomainName: ${self:custom.apiDomain}
+        EndpointConfiguration:
+          Types:
+            - REGIONAL
 
     ErrorsTopic:
       Type: AWS::SNS::Topic
@@ -148,10 +163,15 @@ functions:
     name: ${self:custom.prefix}-app
     memorySize: 128 # mb
     timeout: 5 # seconds
-    url: true
     environment:
       DYNAMODB_TABLE_NAME: ${self:custom.dynamodbTableName}
-    events: ${self:custom.functionEvents.perEnv.${self:provider.stage}}
+    events:
+      - http:
+          path: /
+          method: any
+      - http:
+          path: /{proxy+}
+          method: any
     iamRoleStatements:
       - Effect: "Allow"
         Action:

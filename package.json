@@ -18,6 +18,7 @@
   "devDependencies": {
     "concurrently": "^8.2.2",
     "serverless": "^3.38.0",
+    "serverless-domain-manager": "^7.3.8",
     "serverless-dynamodb": "^0.2.53",
     "serverless-iam-roles-per-function": "^3.2.0",
     "serverless-offline": "^13.5.0",
