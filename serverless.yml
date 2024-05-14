@@ -48,6 +48,12 @@ custom:
       noStart: true
 
 resources:
+  Conditions:
+    ProductionOnly:
+      Fn::Equals:
+        - ${self:provider.stage}
+        - prod
+
   Resources:
     MainTable:
       Type: AWS::DynamoDB::Table
@@ -109,11 +115,13 @@ resources:
 
     ErrorsTopic:
       Type: AWS::SNS::Topic
+      Condition: ProductionOnly
       Properties:
         TopicName: ${self:custom.prefix}-errors
 
     ErrorsTopicSubscription:
       Type: AWS::SNS::Subscription
+      Condition: ProductionOnly
       Properties:
         Endpoint: ${self:custom.alertsEmail}
         Protocol: email
@@ -121,6 +129,7 @@ resources:
 
     ErrorsAlarmAppFunction:
       Type: AWS::CloudWatch::Alarm
+      Condition: ProductionOnly
       Properties:
         AlarmDescription: "Alarms for ${self:custom.prefix}-app"
         Namespace: AWS/Lambda
@@ -138,6 +147,7 @@ resources:
 
     ErrorsAlarmDbBackupFunction:
       Type: AWS::CloudWatch::Alarm
+      Condition: ProductionOnly
       Properties:
         AlarmDescription: "Alarms for ${self:custom.prefix}-db-backup"
         Namespace: AWS/Lambda
