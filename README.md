@@ -30,3 +30,7 @@ yarn run serverless remove --stage stg
 # or..
 yarn run serverless remove --stage prod
 ```
+
+## Diagram
+
+![Diagram](./.readme-assets/diagram.jpg)
